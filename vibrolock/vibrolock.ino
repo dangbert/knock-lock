@@ -1,6 +1,6 @@
 const int ledPin=12;
 int sensorValue;
-
+unsigned long temp_time;
 
 #define IN1  8
 #define IN2  9
@@ -22,6 +22,7 @@ void setup() {
   pinMode(12, OUTPUT);
 
 
+  //MOTOR:::::
   pinMode(IN1, OUTPUT); 
   pinMode(IN2, OUTPUT); 
   pinMode(IN3, OUTPUT); 
@@ -31,32 +32,44 @@ void setup() {
  
 void loop() {
 
-while(steps_left>0){
-    currentMillis = micros();
-    if(currentMillis-last_time>=1000){
-      stepper(1); 
-      time=time+micros()-last_time;
-      last_time=micros();
-      steps_left--;
-      }
-  }
-  Serial.println(time);
-  Serial.println("Wait...!");
-  delay(2000);
-  Direction=!Direction;
-  steps_left=4095;
+//MOTOR::::::
+//while(steps_left>0){
+//    currentMillis = micros();
+//    if(currentMillis-last_time>=1000){
+//      stepper(1); 
+//      time=time+micros()-last_time;
+//      last_time=micros();
+//      steps_left--;
+//      }
+//  }
+//  Serial.println(time);
+//  Serial.println("Wait...!");
+//  delay(2000);
+//  Direction=!Direction;
+//  steps_left=4095;
 
-//  sensorValue = analogRead(A0);
-//  Serial.println(sensorValue);
-//  delay(100);
-//  if(sensorValue==1023)
-//    {
-//    digitalWrite(ledPin,HIGH);
-//    }
-//  else
-//    {
-//    digitalWrite(ledPin,LOW);
-//    }
+  sensorValue = analogRead(A0);
+//  if(temp != sensorValue)
+//    Serial.println(sensorValue);
+
+
+  
+  if(sensorValue > 15) {
+    //Serial.print(sensorValue);
+    Serial.print("Tapped: wait=");
+    Serial.println(millis() - temp_time);
+    temp_time = millis();
+    delay(50);
+  }
+  
+  if(sensorValue==1023)
+    {
+    digitalWrite(ledPin,HIGH);
+    }
+  else
+    {
+    digitalWrite(ledPin,LOW);
+    }
 }
 
 
