@@ -1,7 +1,13 @@
 const int ledPin=12;
 int sensorValue;
 unsigned long temp_time;
+unsigned long diff=0;
 int num=0;
+
+boolean learned = false;
+boolean printed = false;
+
+int mem[] = {0,0,0,0,0,0,0,0,0,0};
 
 #define IN1  8
 #define IN2  9
@@ -16,7 +22,6 @@ long time;
 
 
 void setup() {
-  
   Serial.begin(9600);
   Serial.println(".....");
   pinMode(ledPin,OUTPUT);
@@ -27,7 +32,7 @@ void setup() {
   pinMode(IN1, OUTPUT); 
   pinMode(IN2, OUTPUT); 
   pinMode(IN3, OUTPUT); 
-  pinMode(IN4, OUTPUT); 
+  pinMode(IN4, OUTPUT);
   Serial.println("Setup complete");
 } 
  
@@ -50,29 +55,37 @@ void loop() {
 //  steps_left=4095;
 
   sensorValue = analogRead(A0);
-//  if(temp != sensorValue)
-//    Serial.println(sensorValue);
 
-
+   if(learned && !printed) {
+      printArray();
+      printed = true;
+    }
   
   if(sensorValue > 15) {
-    //Serial.print(sensorValue);
-    //Serial.print("Tapped: wait=");
-    if(millis() - temp_time > 3000)
+    diff = millis() - temp_time;
+    
+    if(diff > 3000 && mem[0] != 0) { //at least one knock was done
+      learned = true;
       Serial.println("**********************");
-    Serial.println(millis() - temp_time);
+    }
+    
+    if(!learned) {
+      for(int i=0; i<10; i++) { //loop through 
+        if(mem[i] == 0) { //if nothing is stored there
+          mem[i] = diff; ///fix this for first time through???
+          if(i == 9)
+            learned = true;
+          break;
+          
+        }
+      }
+    }
+    
+    Serial.println(diff);
     temp_time = millis();
     delay(50);
   }
   
-  if(sensorValue==1023)
-    {
-    digitalWrite(ledPin,HIGH);
-    }
-  else
-    {
-    digitalWrite(ledPin,LOW);
-    }
 }
 
 
@@ -142,6 +155,15 @@ void stepper(int xw){
   if(Direction==0){ Steps--; }
   if(Steps>7){Steps=0;}
   if(Steps<0){Steps=7; }
+}
+
+void printArray() {
+  Serial.println("PRINTING MEM[]");
+  for(int i=0; i<10; i++) {
+    Serial.println(mem[i]);
+    
+  }
+  Serial.println("\n");
 }
 
 
