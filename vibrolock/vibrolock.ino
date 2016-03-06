@@ -89,7 +89,7 @@ void loop() {
         for(int i=0; i<10; i++) { //loop through mem
           if(mem[i] == 0) { //if nothing is stored there
             mem[i] = diff; ///fix this for first time through???
-            Serial.print("^^^: "); Serial.println(diff);
+            Serial.println(diff);
             if(i == 9) {
               learned = true;
               Serial.println("**********************");
@@ -110,7 +110,7 @@ void loop() {
 //            }
           if(cur[i] == 0) { //if nothing is stored there
             cur[i] = diff; ///fix this for first time through???
-            Serial.print("```: "); Serial.println(diff);
+            Serial.println(diff);
             if(i == 9) {
               stored_cur = true;
             }
@@ -244,7 +244,7 @@ void checkValid() {
     Serial.print(cur[i]); Serial.print("\t"); Serial.print(mem[i]); Serial.print("\t");
     Serial.print((double) error); Serial.println("%");
     
-    if(error > 80.0 || error < -80.0 ) {///.4 for now
+    if(error > 40.0 || error < -40.0 ) {///.4 for now
       Serial.print(cur[i]); Serial.print(" !~ "); Serial.println(mem[i]);
       Serial.println("INCORRECT");
       break;
@@ -278,12 +278,6 @@ boolean checkSize() {
     cur_length++;
   }
   
-//  for(int i=0; i<10; i++) {
-//    //Serial.print("truth value="); Serial.println((mem[i] != 0));
-//    if((mem[i] != 0 && cur[i] == 0) || (mem[i]==0 && cur[i]==0)) {
-//      return false;
-//    }
-//  }
 
   if(mem_length != cur_length || mem_length==0)
     return false;
