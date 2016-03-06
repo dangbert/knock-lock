@@ -1,3 +1,8 @@
+#include <Wire.h>
+#include "rgb_lcd.h"
+rgb_lcd lcd;
+
+
 const int ledPin=12;
 int sensorValue;
 unsigned long temp_time;
@@ -32,12 +37,21 @@ void setup() {
   pinMode(ledPin,OUTPUT);
   pinMode(12, OUTPUT);
 
+    for(int i=2; i<=6; i++) 
+      pinMode(i, OUTPUT);
+
 
   //MOTOR:::::
   pinMode(IN1, OUTPUT); 
   pinMode(IN2, OUTPUT); 
   pinMode(IN3, OUTPUT); 
   pinMode(IN4, OUTPUT);
+
+  //LCD:::::
+  // set up the LCD's number of columns and rows:
+  lcd.begin(16, 2);
+  write_LCD("LOCKED");
+  lcd.setRGB(255,0,0);
   Serial.println("Setup complete");
 } 
  
@@ -62,7 +76,7 @@ void loop() {
     }
 
     if(checkSize()) {
-      Serial.println("FLAG 1");
+      //Serial.println("FLAG 1");
     //if(learned && stored_cur && !printed_cur) {
       Serial.println("Printing cur:");
       printArray(cur);
@@ -153,6 +167,14 @@ void motor_loop() {
   delay(2000);
   Direction=!Direction;
   steps_left=4095;
+
+  ///LEDS:
+  for(int i=2; i<=6; i++) {
+    digitalWrite(i, HIGH);
+    delay(80);
+    digitalWrite(i, LOW);
+    delay(80);
+  }
   }
 }
 
@@ -251,6 +273,8 @@ void checkValid() {
     }
     if(i==9) {
       Serial.println("UNLOCKED!!!!!!!!!!!!!!");
+      write_LCD("UNLOCKED");
+      lcd.setRGB(0,255,0);
       motor_loop();
     }
       
@@ -283,4 +307,10 @@ boolean checkSize() {
     return false;
   return true;
 }
+
+void write_LCD(char s[]) {
+  lcd.clear();
+  lcd.write(s);
+}
+
 
