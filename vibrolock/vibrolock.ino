@@ -9,6 +9,7 @@ boolean printed_mem = false;
 boolean printed_cur = false;
 boolean stored_cur = false;
 boolean first_cur = false;
+int prenum = 0;
 
 int mem[] = {0,0,0,0,0,0,0,0,0,0}; //lock sequence
 int cur[] = {0,0,0,0,0,0,0,0,0,0}; //current sequence
@@ -42,103 +43,118 @@ void setup() {
  
 void loop() {
 
-//MOTOR::::::
-//while(steps_left>0){
-//    currentMillis = micros();
-//    if(currentMillis-last_time>=1000){
-//      stepper(1); 
-//      time=time+micros()-last_time;
-//      last_time=micros();
-//      steps_left--;
-//      }
-//  }
-//  Serial.println(time);
-//  Serial.println("Wait...!");
-//  delay(2000);
-//  Direction=!Direction;
-//  steps_left=4095;
-
+  //motor_loop();
   sensorValue = analogRead(A0);
 
 
-
-  ///NEED TO RESET CUR AFTER EACH PATTERN ENTERED
-  if(sensorValue > 15) { //if a knock occurred
-    diff = millis() - temp_time; //time since last knock
-    
-    //when done recording mem
-    if(diff > 3000 && mem[0] != 0) { //at least one knock was done
+    if(millis()-temp_time > 3000 && mem[0] != 0 && !learned) { //at least one knock was done
       learned = true;
       Serial.println("**********************");
     }
-
-    //record mem
-    if(!learned && diff<3000) { //don't save first time of knock sequence
-      for(int i=0; i<10; i++) { //loop through 
-        if(mem[i] == 0) { //if nothing is stored there
-          mem[i] = diff; ///fix this for first time through???
-          if(i == 9)
-            learned = true;
-          break;
-        }
-      }
-    }
-
-    //record cur
-    if(learned && diff < 3000) { //don't save first time of knock sequence
-      
-      for(int i=0; i<10; i++) { //loop through
-        if(!first_cur) {
-          first_cur = true;
-          break;
-          }
-        if(cur[i] == 0) { //if nothing is stored there
-          cur[i] = diff; ///fix this for first time through???
-          if(i == 9) {
-            stored_cur = true;
-          }
-          break;
-        }
-      }
-    }
-
-
-    if(learned && stored_cur && !printed_cur) {
-          Serial.println("Printing cur:");
-          printArray(cur);
-          printed_cur = true;
-          checkValid();
-    }
-
-//    if(learned && !printed_cur) {
-//      for(int i=0; i<10; i++) {
-//        //if(mem[i] != 0 && cur[i]==0) ////////THIS IS IMPORTANT!!!
-//          //break;
-//        
-//        if(i == 9) {
-//          Serial.println("Printing cur:");
-//          printArray(cur);
-//          printed_cur = true;
-//        }
-//
-//      }
-//    }
-
-
-    if(diff < 3000)
-      Serial.println(diff);
-    temp_time = millis();
-    delay(50);
 
     if(learned && !printed_mem) {
       Serial.println("Printing mem");
       printArray(mem);
       printed_mem = true;
+      Serial.println("Unlock pattern recorded. Please wait...");
+      delay(3000);
+      Serial.println("ready to be unlocked");
+    }
+
+    if(checkSize()) {
+      Serial.println("FLAG 1");
+    //if(learned && stored_cur && !printed_cur) {
+      Serial.println("Printing cur:");
+      printArray(cur);
+      printed_cur = true;
+      checkValid();
+      resetArray(cur);
+      printed_cur = false;
+      stored_cur = false;
+      Serial.println("Please wait...");
+      delay(3000);
+      Serial.println("ready to be unlocked");
+    }
+
+    
+  
+  if(sensorValue > 17) { //if a knock occurred
+    //Serial.print("knocked "); Serial.print("diff="); Serial.println(diff);
+    
+    diff = millis() - temp_time; //time since last knock
+    if(prenum > 0) {
+      //Serial.println("FLAG3");
+      //record mem
+      if(!learned) { //don't save first time of knock sequence
+        for(int i=0; i<10; i++) { //loop through mem
+          if(mem[i] == 0) { //if nothing is stored there
+            mem[i] = diff; ///fix this for first time through???
+            Serial.print("^^^: "); Serial.println(diff);
+            if(i == 9) {
+              learned = true;
+              Serial.println("**********************");
+            }
+            break;
+          }
+        }
+      }
+  
+  
+      //record cur
+      if(learned && diff < 3000) { //don't save first time of knock sequence
+        
+        for(int i=0; i<10; i++) { //loop through
+//          if(!first_cur) {
+//            first_cur = true;
+//            break;
+//            }
+          if(cur[i] == 0) { //if nothing is stored there
+            cur[i] = diff; ///fix this for first time through???
+            Serial.print("```: "); Serial.println(diff);
+            if(i == 9) {
+              stored_cur = true;
+            }
+            break;
+          }
+        }
+      }
+  
+  
+  
+//      if(diff < 3000)
+//        Serial.println(diff);
+      temp_time = millis();
+      delay(50);
+    }
+    else {
+      delay(50);
+      prenum++;
+      temp_time = millis();
     }
   }
   
 }
 
+
+void motor_loop() {
+
+  while(1) {
+  while(steps_left>0){
+    currentMillis = micros();
+    if(currentMillis-last_time>=1000){
+      stepper(1); 
+      time=time+micros()-last_time;
+      last_time=micros();
+      steps_left--;
+      }
+  }
+  //Serial.println(time);
+  //Serial.println("Wait...!");
+  delay(2000);
+  Direction=!Direction;
+  steps_left=4095;
+  }
+}
 
 void stepper(int xw){
     for (int x=0;x<xw;x++){
@@ -218,7 +234,7 @@ void printArray(int ar[]) {
 }
 
 void checkValid() {
-  Serial.println("checking unknock pattern"); //knock lock
+  Serial.println("CHECKING UNLOCK PATTERN"); //knock lock
   for(int i=0; i<10; i++) {
 //    double error = (double) abs((cur[i]-mem[i])/mem[i]);
     double error = (double) (cur[i]-mem[i])/mem[i];
@@ -228,15 +244,49 @@ void checkValid() {
     Serial.print(cur[i]); Serial.print("\t"); Serial.print(mem[i]); Serial.print("\t");
     Serial.print((double) error); Serial.println("%");
     
-    if(error > 40.0 || error < -40.0 ) {///.4 for now
+    if(error > 80.0 || error < -80.0 ) {///.4 for now
       Serial.print(cur[i]); Serial.print(" !~ "); Serial.println(mem[i]);
       Serial.println("INCORRECT");
       break;
     }
-    if(i==9)
-      Serial.println("AYYYYYYY LMAO UNLOCKED");
+    if(i==9) {
+      Serial.println("UNLOCKED!!!!!!!!!!!!!!");
+      motor_loop();
+    }
       
   }
 }
 
+void resetArray(int ar[]) {
+  for(int i=0; i<10; i++) {
+    ar[0] = 0;
+  }
+}
+
+boolean checkSize() {
+  int mem_length=0;
+  int cur_length=0;
+  for(int i=0; i<10; i++) {
+    if(mem[i]==0)
+      break;
+    mem_length++;
+  }
+
+  for(int i=0; i<10; i++) {
+    if(cur[i]==0)
+      break;
+    cur_length++;
+  }
+  
+//  for(int i=0; i<10; i++) {
+//    //Serial.print("truth value="); Serial.println((mem[i] != 0));
+//    if((mem[i] != 0 && cur[i] == 0) || (mem[i]==0 && cur[i]==0)) {
+//      return false;
+//    }
+//  }
+
+  if(mem_length != cur_length || mem_length==0)
+    return false;
+  return true;
+}
 
