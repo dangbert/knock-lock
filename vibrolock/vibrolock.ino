@@ -71,7 +71,7 @@ void loop() {
       printArray(mem);
       printed_mem = true;
       Serial.println("Unlock pattern recorded. Please wait...");
-      delay(3000);
+      //delay(1000);
       Serial.println("ready to be unlocked");
     }
 
