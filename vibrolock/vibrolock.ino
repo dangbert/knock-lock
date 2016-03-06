@@ -63,25 +63,25 @@ void loop() {
   
   if(sensorValue > 15) {
     diff = millis() - temp_time;
-    
+
     if(diff > 3000 && mem[0] != 0) { //at least one knock was done
       learned = true;
       Serial.println("**********************");
     }
     
-    if(!learned) {
+    if(!learned && diff<3000) { //don't save first time of knock sequence
       for(int i=0; i<10; i++) { //loop through 
         if(mem[i] == 0) { //if nothing is stored there
           mem[i] = diff; ///fix this for first time through???
           if(i == 9)
             learned = true;
           break;
-          
         }
       }
     }
-    
-    Serial.println(diff);
+
+    if(diff < 3000)
+      Serial.println(diff);
     temp_time = millis();
     delay(50);
   }
