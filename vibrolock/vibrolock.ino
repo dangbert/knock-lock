@@ -5,16 +5,20 @@ unsigned long diff=0;
 int num=0;
 
 boolean learned = false;
-boolean printed = false;
+boolean printed_mem = false;
+boolean printed_cur = false;
+boolean stored_cur = false;
+boolean first_cur = false;
 
-int mem[] = {0,0,0,0,0,0,0,0,0,0};
+int mem[] = {0,0,0,0,0,0,0,0,0,0}; //lock sequence
+int cur[] = {0,0,0,0,0,0,0,0,0,0}; //current sequence
 
 #define IN1  8
 #define IN2  9
 #define IN3  10
 #define IN4  11
 int Steps = 0;
-boolean Direction = true;// gre
+boolean Direction = true;
 unsigned long last_time;
 unsigned long currentMillis ;
 int steps_left=4095;
@@ -56,19 +60,19 @@ void loop() {
 
   sensorValue = analogRead(A0);
 
-   if(learned && !printed) {
-      printArray();
-      printed = true;
-    }
-  
-  if(sensorValue > 15) {
-    diff = millis() - temp_time;
 
+
+  ///NEED TO RESET CUR AFTER EACH PATTERN ENTERED
+  if(sensorValue > 15) { //if a knock occurred
+    diff = millis() - temp_time; //time since last knock
+    
+    //when done recording mem
     if(diff > 3000 && mem[0] != 0) { //at least one knock was done
       learned = true;
       Serial.println("**********************");
     }
-    
+
+    //record mem
     if(!learned && diff<3000) { //don't save first time of knock sequence
       for(int i=0; i<10; i++) { //loop through 
         if(mem[i] == 0) { //if nothing is stored there
@@ -80,10 +84,57 @@ void loop() {
       }
     }
 
+    //record cur
+    if(learned && diff < 3000) { //don't save first time of knock sequence
+      
+      for(int i=0; i<10; i++) { //loop through
+        if(!first_cur) {
+          first_cur = true;
+          break;
+          }
+        if(cur[i] == 0) { //if nothing is stored there
+          cur[i] = diff; ///fix this for first time through???
+          if(i == 9) {
+            stored_cur = true;
+          }
+          break;
+        }
+      }
+    }
+
+
+    if(learned && stored_cur && !printed_cur) {
+          Serial.println("Printing cur:");
+          printArray(cur);
+          printed_cur = true;
+          checkValid();
+    }
+
+//    if(learned && !printed_cur) {
+//      for(int i=0; i<10; i++) {
+//        //if(mem[i] != 0 && cur[i]==0) ////////THIS IS IMPORTANT!!!
+//          //break;
+//        
+//        if(i == 9) {
+//          Serial.println("Printing cur:");
+//          printArray(cur);
+//          printed_cur = true;
+//        }
+//
+//      }
+//    }
+
+
     if(diff < 3000)
       Serial.println(diff);
     temp_time = millis();
     delay(50);
+
+    if(learned && !printed_mem) {
+      Serial.println("Printing mem");
+      printArray(mem);
+      printed_mem = true;
+    }
   }
   
 }
@@ -157,13 +208,35 @@ void stepper(int xw){
   if(Steps<0){Steps=7; }
 }
 
-void printArray() {
-  Serial.println("PRINTING MEM[]");
+void printArray(int ar[]) {
+  Serial.println("\nPRINTING ARRAY[]");
   for(int i=0; i<10; i++) {
-    Serial.println(mem[i]);
+    Serial.println(ar[i]);
     
   }
   Serial.println("\n");
+}
+
+void checkValid() {
+  Serial.println("checking unknock pattern"); //knock lock
+  for(int i=0; i<10; i++) {
+//    double error = (double) abs((cur[i]-mem[i])/mem[i]);
+    double error = (double) (cur[i]-mem[i])/mem[i];
+    error = abs(error);
+    error = 100 * error;
+    Serial.print("error="); Serial.println(error);
+    Serial.print(cur[i]); Serial.print("\t"); Serial.print(mem[i]); Serial.print("\t");
+    Serial.print((double) error); Serial.println("%");
+    
+    if(error > 40.0 || error < -40.0 ) {///.4 for now
+      Serial.print(cur[i]); Serial.print(" !~ "); Serial.println(mem[i]);
+      Serial.println("INCORRECT");
+      break;
+    }
+    if(i==9)
+      Serial.println("AYYYYYYY LMAO UNLOCKED");
+      
+  }
 }
 
 
