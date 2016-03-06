@@ -1,6 +1,7 @@
 const int ledPin=12;
 int sensorValue;
 unsigned long temp_time;
+int num=0;
 
 #define IN1  8
 #define IN2  9
@@ -56,7 +57,9 @@ void loop() {
   
   if(sensorValue > 15) {
     //Serial.print(sensorValue);
-    Serial.print("Tapped: wait=");
+    //Serial.print("Tapped: wait=");
+    if(millis() - temp_time > 3000)
+      Serial.println("**********************");
     Serial.println(millis() - temp_time);
     temp_time = millis();
     delay(50);
