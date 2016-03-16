@@ -1,5 +1,5 @@
 # UMBC_Hackathon_2016
-Project Created for Hack UMBC 2016.  https://hackumbc.org/
+Project Created for [Hack UMBC 2016](https://hackumbc.org/)
 
 ####PURPOSE:####
 To create an Arduino system that records a pattern of knocks on a door, and unlocks the door when that pattern is entered again later.
@@ -7,7 +7,8 @@ To create an Arduino system that records a pattern of knocks on a door, and unlo
 ####REQUIREMENTS:####
 * Arduino UNO
 * Grove Piezo Vibration Sensor
-* Grove_LCD_RGB_Backlight-master Arduino Library: https://github.com/Seeed-Studio/Grove_LCD_RGB_Backlight
+* Grove LCD RGB
+* [Grove_LCD_RGB_Backlight-master Arduino Library](https://github.com/Seeed-Studio/Grove_LCD_RGB_Backlight)
 * Grove Hardware Shield (optional)
 * BYJ48 Stepper motor
 
