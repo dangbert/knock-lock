@@ -13,12 +13,12 @@ To create an Arduino system that records a pattern of knocks on a door, and unlo
 * BYJ48 Stepper motor
 
 ####RESULTS:####
-When the arduino code is ran, it first records a sequence of (up to 11) knocks.  The project can successfullly record when the vibration sensor is on the other side of a piece of cardborad, but you must still knock hard because the sensor is not highly sensistive.  Next, a sequence of the same length as the lock pattern can be entered, and the 'unlock action' will succesfully occur if all the knocks have less than a 40% error when compared to the correct lock sequence.
+When the Arduino code is ran, it first records a sequence of (up to 11) knocks.  The project can successfully record when the vibration sensor is on the other side of a piece of cardboard, but you must still knock hard because the sensor is not highly sensitive.  Next, a sequence of the same number of knocks as the lock pattern can be entered, and the 'unlock action' will successfully occur if all the knocks have less than a 40% error when compared to the correct lock sequence.
 The knock sequences are compared by comparing the times (in milliseconds) between successive knocks.
-For this project, the 'unlock action' just changed the LCD's color, rotated a stepper motor, an turned on LEDs.
+For this project, the 'unlock action' just changed the LCD's color, rotated a stepper motor, and turned on LEDs.
 
 ####LIMITATIONS:####
-After recording the lock sequence, only one attempt can be made to unlock the 'door', after which the Arduino must be reset and a new lock sequence created.  This bug was due to the time constraints but didn't prevent the project from being demonstratable.  Due to the 24 hour time contstraint, the code is also somewhat inefficient/disoganized.
+After recording the lock sequence, only one attempt can be made to unlock the 'door', after which the Arduino must be reset and a new lock sequence created.  This bug was due to the time constraints but didn't prevent the project from being demonstrable.  Due to the 24 hour time constraint, the code is also somewhat inefficient/disorganized.
 
 ####NOTE:####
 The stepper motor code was taken entirely from: http://www.instructables.com/id/BYJ48-Stepper-Motor/?ALLSTEPS
