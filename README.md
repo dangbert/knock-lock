@@ -1,4 +1,4 @@
-# UMBC_Hackathon_2016
+# KnockLock
 Project Created for [Hack UMBC 2016](https://hackumbc.org/)
 
 ####PURPOSE:####
