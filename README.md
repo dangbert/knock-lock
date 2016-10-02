@@ -1,5 +1,5 @@
 # KnockLock
-Project Created for [Hack UMBC 2016](https://hackumbc.org/)
+Project Created for [Hack UMBC Spring 2016](https://hackumbc.org/)
 
 ####PURPOSE:####
 To create an Arduino system that records a pattern of knocks on a door, and unlocks the door when that pattern is entered again later.
